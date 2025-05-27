@@ -144,9 +144,7 @@ const fetchRandomImage = async () => {
   <img 
     src={currentImage.url} 
     alt={currentImage.alt}
-    className="w-full md:w-[600px] max-h-[600px] rounded-lg shadow-md object-contain mx-auto"
-
-
+    className="w-full max-w-[500px] max-h-[600px] rounded-lg shadow-md object-contain mx-auto"
 
   />
 </div>
