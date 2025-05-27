@@ -136,7 +136,7 @@ const DrawingChallengeApp = () => {
                   className="max-h-[600px] rounded-lg shadow-lg object-contain"
                   style={{
                     width: '100%',
-                    maxWidth: window.innerWidth < 640 ? '100%' : '500px'
+                    maxWidth: window.innerWidth < 640 ? '100%' : '768px'
                   }}
                 />
               </div>
