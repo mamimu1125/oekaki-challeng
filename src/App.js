@@ -140,12 +140,12 @@ const fetchRandomImage = async () => {
                 <span className="text-2xl">{categories[selectedCategory].emoji}</span>
               </div>
               
-         <div className="flex justify-center mb-4">
+<div className="flex justify-center mb-4">
   <img 
     src={currentImage.url} 
     alt={currentImage.alt}
-    className="w-full max-w-[500px] max-h-[600px] rounded-lg shadow-md object-contain mx-auto"
-
+    className="max-w-[500px] max-h-[600px] rounded-lg shadow-md object-contain"
+    style={{width: 'auto'}}
   />
 </div>
               
