@@ -11,7 +11,7 @@ const DrawingChallengeApp = () => {
   const [selectedTime, setSelectedTime] = useState(300);
   const [timerActive, setTimerActive] = useState(false);
 
-  const UNSPLASH_ACCESS_KEY = 'j2gjfofhuYXxmroes10MK3ynljynIHAFFBY58GyMhms';
+  const UNSPLASH_ACCESS_KEY = process.env.REACT_APP_UNSPLASH_ACCESS_KEY;
 
   const categories = {
     animals: { emoji: '🐱', name: '動物', keywords: ['cat', 'dog', 'bird', 'lion', 'elephant'] },
