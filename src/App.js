@@ -62,53 +62,50 @@ const DrawingChallengeApp = () => {
     setTimer(0);
   };
 
-const fetchRandomImage = async () => {
-  if (!selectedCategory) return;
-  setLoading(true);
-  stopTimer();
+  const fetchRandomImage = async () => {
+    if (!selectedCategory) return;
+    setLoading(true);
+    stopTimer();
 
-  // フォールバックを削除して、Unsplash APIのみ使用
-  try {
-    const categoryData = categories[selectedCategory];
-    const randomKeyword = categoryData.keywords[Math.floor(Math.random() * categoryData.keywords.length)];
-    
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const apiUrl = `https://api.unsplash.com/photos/random?query=${randomKeyword}&client_id=${UNSPLASH_ACCESS_KEY}`;
-    
-    const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
-    
-    if (!response.ok) {
-      // API失敗時は別のキーワードで再試行
-      const anotherKeyword = categoryData.keywords[Math.floor(Math.random() * categoryData.keywords.length)];
-      const retryUrl = `https://api.unsplash.com/photos/random?query=${anotherKeyword}&client_id=${UNSPLASH_ACCESS_KEY}`;
-      const retryResponse = await fetch(proxyUrl + encodeURIComponent(retryUrl));
-      const retryData = await retryResponse.json();
+    try {
+      const categoryData = categories[selectedCategory];
+      const randomKeyword = categoryData.keywords[Math.floor(Math.random() * categoryData.keywords.length)];
       
-      setCurrentImage({
-        url: retryData.urls.regular,
-        alt: retryData.alt_description || `${anotherKeyword} image`,
-        photographer: retryData.user.name,
-        link: retryData.links.html
-      });
-    } else {
-      const data = await response.json();
-      setCurrentImage({
-        url: data.urls.regular,
-        alt: data.alt_description || `${randomKeyword} image`,
-        photographer: data.user.name,
-        link: data.links.html
-      });
+      const proxyUrl = 'https://api.allorigins.win/raw?url=';
+      const apiUrl = `https://api.unsplash.com/photos/random?query=${randomKeyword}&client_id=${UNSPLASH_ACCESS_KEY}`;
+      
+      const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+      
+      if (!response.ok) {
+        const anotherKeyword = categoryData.keywords[Math.floor(Math.random() * categoryData.keywords.length)];
+        const retryUrl = `https://api.unsplash.com/photos/random?query=${anotherKeyword}&client_id=${UNSPLASH_ACCESS_KEY}`;
+        const retryResponse = await fetch(proxyUrl + encodeURIComponent(retryUrl));
+        const retryData = await retryResponse.json();
+        
+        setCurrentImage({
+          url: retryData.urls.regular,
+          alt: retryData.alt_description || `${anotherKeyword} image`,
+          photographer: retryData.user.name,
+          link: retryData.links.html
+        });
+      } else {
+        const data = await response.json();
+        setCurrentImage({
+          url: data.urls.regular,
+          alt: data.alt_description || `${randomKeyword} image`,
+          photographer: data.user.name,
+          link: data.links.html
+        });
+      }
+      
+      startTimer();
+    } catch (error) {
+      console.error('Error fetching image:', error);
+      alert('画像の取得に失敗しました。もう一度お試しください。');
+    } finally {
+      setLoading(false);
     }
-    
-    startTimer();
-  } catch (error) {
-    console.error('Error fetching image:', error);
-    // 最終的なフォールバックとして、カテゴリ名で検索
-    alert('画像の取得に失敗しました。もう一度お試しください。');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const startChallenge = () => {
     setShowChallenge(true);
@@ -124,30 +121,25 @@ const fetchRandomImage = async () => {
   if (showChallenge) {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold text-center mb-4 text-gray-800">
-            🎨 ランダム描画チャレンジ
-          </h1>
-
+        <div className="max-w-4xl mx-auto">
           {loading ? (
             <div className="flex justify-center items-center h-96">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
               <span className="ml-4 text-gray-600">画像を取得中...</span>
             </div>
           ) : currentImage ? (
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-              <div className="text-center mb-4">
-                <span className="text-2xl">{categories[selectedCategory].emoji}</span>
+            <div className="mb-6">
+              <div className="flex justify-center mb-4">
+                <img 
+                  src={currentImage.url} 
+                  alt={currentImage.alt}
+                  className="max-h-[600px] rounded-lg shadow-lg object-contain"
+                  style={{
+                    width: '100%',
+                    maxWidth: window.innerWidth < 640 ? '100%' : '500px'
+                  }}
+                />
               </div>
-              
-<div className="flex justify-center mb-4">
-  <img 
-    src={currentImage.url} 
-    alt={currentImage.alt}
-    className="max-w-[500px] max-h-[600px] rounded-lg shadow-md object-contain"
-    style={{width: 'auto'}}
-  />
-</div>
               
               <p className="text-center text-gray-600 text-sm">
                 Photo by {currentImage.photographer}
@@ -155,38 +147,37 @@ const fetchRandomImage = async () => {
             </div>
           ) : null}
 
-          <div className="bg-white rounded-lg shadow-lg p-4 mb-6">
-            <div className="flex justify-center items-center gap-4 mb-4">
-              {timeOptions.map(option => (
-                <button
-                  key={option.value}
-                  onClick={() => {
-  setSelectedTime(option.value);
-  if (option.value > 0) {
-    setTimer(option.value);
-    setTimerActive(true);
-  } else {
-    setTimer(0);
-    setTimerActive(false);
-  }
-}}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedTime === option.value
-                      ? 'bg-gray-800 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-            
-            <div className="text-center">
-              <div className={`inline-block px-4 py-2 rounded-lg font-mono text-lg font-bold ${
-                timer <= 30 && timerActive ? 'bg-red-100 text-red-800' : 'bg-gray-800 text-white'
-              }`}>
-                {selectedTime === 0 ? '--:--' : formatTime(timer)}
-              </div>
+          {/* タイマー部分 - 枠なし */}
+          <div className="flex justify-center items-center gap-4 mb-4">
+            {timeOptions.map(option => (
+              <button
+                key={option.value}
+                onClick={() => {
+                  setSelectedTime(option.value);
+                  if (option.value > 0) {
+                    setTimer(option.value);
+                    setTimerActive(true);
+                  } else {
+                    setTimer(0);
+                    setTimerActive(false);
+                  }
+                }}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  selectedTime === option.value
+                    ? 'bg-gray-800 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          
+          <div className="text-center mb-6">
+            <div className={`inline-block px-4 py-2 rounded-lg font-mono text-lg font-bold ${
+              timer <= 30 && timerActive ? 'bg-red-100 text-red-800' : 'bg-gray-800 text-white'
+            }`}>
+              {selectedTime === 0 ? '--:--' : formatTime(timer)}
             </div>
           </div>
 
