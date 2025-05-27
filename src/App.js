@@ -124,7 +124,7 @@ const fetchRandomImage = async () => {
   if (showChallenge) {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <h1 className="text-2xl font-bold text-center mb-4 text-gray-800">
             🎨 ランダム描画チャレンジ
           </h1>
@@ -140,13 +140,13 @@ const fetchRandomImage = async () => {
                 <span className="text-2xl">{categories[selectedCategory].emoji}</span>
               </div>
               
-              <div className="flex justify-center mb-4">
-                <img 
-                  src={currentImage.url} 
-                  alt={currentImage.alt}
-                  className="max-w-full max-h-96 rounded-lg shadow-md object-contain"
-                />
-              </div>
+         <div className="flex justify-center mb-4">
+  <img 
+    src={currentImage.url} 
+    alt={currentImage.alt}
+    className="w-full max-h-[600px] rounded-lg shadow-md object-contain"  // ← この行
+  />
+</div>
               
               <p className="text-center text-gray-600 text-sm">
                 Photo by {currentImage.photographer}
